@@ -11,6 +11,7 @@ module Backup
         @package   = model.package
         @encryptor = model.encryptor
         @splitter  = model.splitter
+        @checksum_creator  = model.checksum_creator
         @pipeline  = Pipeline.new
 
         Logger.message "Packaging the backup files..."
@@ -82,6 +83,13 @@ module Backup
           stack << lambda do
             outfile = File.join(Config.tmp_path, @package.basename)
             @pipeline << "cat > #{ outfile }"
+
+            if @checksum_creator
+              @checksum_creator.checksum_with outfile do |cmd|
+                @pipeline << cmd
+              end
+            end
+
             stack.shift.call
           end
         end

@@ -107,6 +107,10 @@ Below you find a list of components that Backup currently supports. If you'd lik
 
 [Encryptors Wiki Page](https://github.com/meskyanichi/backup/wiki/Encryptors)
 
+### Checksum
+
+- Shasum (not working with splitter)
+
 ### Notifiers
 
 - Mail

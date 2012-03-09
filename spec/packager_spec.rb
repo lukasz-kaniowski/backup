@@ -10,6 +10,7 @@ describe 'Backup::Packager' do
     let(:package)   { mock }
     let(:encryptor) { mock }
     let(:splitter)  { mock }
+    let(:checksum_creator)  { mock }
     let(:pipeline)  { mock }
     let(:procedure) { mock }
     let(:s)         { sequence '' }
@@ -19,6 +20,7 @@ describe 'Backup::Packager' do
         model.expects(:package).in_sequence(s).returns(package)
         model.expects(:encryptor).in_sequence(s).returns(encryptor)
         model.expects(:splitter).in_sequence(s).returns(splitter)
+        model.expects(:checksum_creator).in_sequence(s).returns(checksum_creator)
         Backup::Pipeline.expects(:new).in_sequence(s).returns(pipeline)
 
         Backup::Logger.expects(:message).in_sequence(s).with(
@@ -38,6 +40,7 @@ describe 'Backup::Packager' do
         packager.instance_variable_get(:@encryptor).should be(encryptor)
         packager.instance_variable_get(:@splitter).should be(splitter)
         packager.instance_variable_get(:@pipeline).should be(pipeline)
+        packager.instance_variable_get(:@checksum_creator).should be(checksum_creator)
       end
     end #context 'when pipeline command is successful'
 
@@ -46,6 +49,7 @@ describe 'Backup::Packager' do
         model.expects(:package).in_sequence(s).returns(package)
         model.expects(:encryptor).in_sequence(s).returns(encryptor)
         model.expects(:splitter).in_sequence(s).returns(splitter)
+        model.expects(:checksum_creator).in_sequence(s).returns(checksum_creator)
         Backup::Pipeline.expects(:new).in_sequence(s).returns(pipeline)
 
         Backup::Logger.expects(:message).in_sequence(s).with(
@@ -69,6 +73,7 @@ describe 'Backup::Packager' do
         packager.instance_variable_get(:@encryptor).should be(encryptor)
         packager.instance_variable_get(:@splitter).should be(splitter)
         packager.instance_variable_get(:@pipeline).should be(pipeline)
+        packager.instance_variable_get(:@checksum_creator).should be(checksum_creator)
       end
     end #context 'when pipeline command is successful'
   end # describe '#package!'
@@ -99,11 +104,16 @@ describe 'Backup::Packager' do
           'base_filename.' + extension
         end
       end
+      class Checksum
+        def checksum_with
+        end
+      end
     end
 
     let(:package)   { Fake::Package.new }
     let(:encryptor) { Fake::Encryptor.new }
     let(:splitter)  { Fake::Splitter.new }
+    let(:checksum_creator)  { Fake::Checksum.new }
     let(:pipeline)  { mock }
     let(:s)         { sequence '' }
 
@@ -120,6 +130,7 @@ describe 'Backup::Packager' do
       it 'should package the backup without encryption into a single file' do
         packager.instance_variable_set(:@encryptor, nil)
         packager.instance_variable_set(:@splitter,  nil)
+        packager.instance_variable_set(:@checksum_creator,  nil)
 
         pipeline.expects(:<<).in_sequence(s).with(
           "tar -cf - -C '#{ Backup::Config.tmp_path }' 'model_trigger'"
@@ -137,6 +148,7 @@ describe 'Backup::Packager' do
       it 'should package the backup with encryption' do
         packager.instance_variable_set(:@encryptor, encryptor)
         packager.instance_variable_set(:@splitter,  nil)
+        packager.instance_variable_set(:@checksum_creator,  nil)
 
         pipeline.expects(:<<).in_sequence(s).with(
           "tar -cf - -C '#{ Backup::Config.tmp_path }' 'model_trigger'"

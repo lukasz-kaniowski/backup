@@ -110,6 +110,8 @@ module Backup
             ['Gzip', 'Bzip2', 'Pbzip2', 'Lzma'],
             # Encryptors
             ['OpenSSL', 'GPG'],
+            # Checksum
+            ['Shasum'],
             # Syncers
             ['Rackspace', 'S3', { 'RSync' => ['Push', 'Pull', 'Local'] }],
             # Notifiers

@@ -68,6 +68,10 @@ module Backup
     attr_reader :compressor
 
     ##
+    # Holds the configured ChecksumCreator
+    attr_reader :checksum_creator
+
+    ##
     # Holds the configured Encryptor
     attr_reader :encryptor
 
@@ -156,6 +160,12 @@ module Backup
     # Adds a compressor to use during the backup process
     def compress_with(name, &block)
       @compressor = get_class_from_scope(Compressor, name).new(&block)
+    end
+
+    ##
+    # Adds a checksum to use during the backup process
+    def checksum_with(name, &block)
+      @checksum_creator = get_class_from_scope(Checksum, name).new(&block)
     end
 
     ##

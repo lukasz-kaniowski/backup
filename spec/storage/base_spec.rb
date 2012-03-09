@@ -4,7 +4,8 @@ require File.expand_path('../../spec_helper.rb', __FILE__)
 
 describe Backup::Storage::Base do
   let(:model)   { Backup::Model.new(:test_trigger, 'test label') }
-  let(:package) { mock }
+  let(:package) { mock("package") }
+  let(:checksum_creator) { mock("checksum_creator") }
   let(:base)    { Backup::Storage::Base.new(model) }
 
   describe '#initialize' do
@@ -45,6 +46,19 @@ describe Backup::Storage::Base do
       base.expects(:cycle!).in_sequence(s)
       base.perform!
       base.instance_variable_get(:@package).should be(package)
+    end
+
+    it "should process checksum file" do
+      model.instance_variable_set(:@checksum_creator, checksum_creator)
+      package.stubs(:filenames).returns []
+      package.stubs(:checksum_name).returns ""
+      s = sequence ''
+      checksum_creator.expects(:process_checksum_file_before_transfer).in_sequence(s)
+      base.expects(:transfer!).in_sequence(s)
+
+      base.perform!
+
+      base.instance_variable_get(:@checksum_creator).should be(checksum_creator)
     end
   end
 

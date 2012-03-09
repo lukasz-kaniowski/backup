@@ -31,6 +31,10 @@ module Backup
       @version = Backup::Version.current
     end
 
+    def checksum_name
+      basename+".sum"
+    end
+
     def filenames
       if chunk_suffixes.empty?
         [basename]

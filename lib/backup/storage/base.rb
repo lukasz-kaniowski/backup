@@ -30,6 +30,10 @@ module Backup
       # Performs the backup transfer
       def perform!
         @package = @model.package
+        @checksum_creator = @model.checksum_creator
+        if @checksum_creator
+          @checksum_creator.process_checksum_file_before_transfer(file_names_as_hash, @package.checksum_name, local_path)
+        end
         transfer!
         cycle!
       end
@@ -68,6 +72,20 @@ module Backup
         File.join(path, package.trigger, package.time)
       end
 
+      def file_names_as_hash(package = @package)
+        hash = {}
+        files_to_transfer_without_checksum package do |local, remote|
+           hash[local] = remote
+        end
+        hash
+      end
+
+      def files_to_transfer_without_checksum(package)
+        package.filenames.each do |filename|
+          yield filename, filename[20..-1]
+        end
+      end
+
       ##
       # Yields two arguments to the given block: "local_file, remote_file"
       # The local_file is the full file name:
@@ -75,8 +93,10 @@ module Backup
       # The remote_file is the full file name, minus the timestamp:
       # e.g. "backup.tar.enc"
       def files_to_transfer_for(package)
-        package.filenames.each do |filename|
-          yield filename, filename[20..-1]
+        file_names_as_hash(package).each {|local, remote| yield local, remote }
+
+        if @model.checksum_creator
+          yield package.checksum_name, package.checksum_name[20..-1]
         end
       end
       alias :transferred_files_for :files_to_transfer_for

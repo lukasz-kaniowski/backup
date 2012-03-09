@@ -30,6 +30,7 @@ module Backup
   STORAGE_PATH       = File.join(LIBRARY_PATH, 'storage')
   DATABASE_PATH      = File.join(LIBRARY_PATH, 'database')
   COMPRESSOR_PATH    = File.join(LIBRARY_PATH, 'compressor')
+  CHECKSUM_PATH      = File.join(LIBRARY_PATH, 'checksum')
   ENCRYPTOR_PATH     = File.join(LIBRARY_PATH, 'encryptor')
   NOTIFIER_PATH      = File.join(LIBRARY_PATH, 'notifier')
   SYNCER_PATH        = File.join(LIBRARY_PATH, 'syncer')
@@ -96,6 +97,13 @@ module Backup
   end
 
   ##
+  # Autoload Checksum files
+  module Checksum
+    autoload :Base,   File.join(CHECKSUM_PATH, 'base')
+    autoload :Shasum,   File.join(CHECKSUM_PATH, 'shasum')
+  end
+
+  ##
   # Autoload encryptor files
   module Encryptor
     autoload :Base,    File.join(ENCRYPTOR_PATH, 'base')
@@ -157,6 +165,11 @@ module Backup
       autoload :SCP,        File.join(CONFIGURATION_PATH, 'storage', 'scp')
       autoload :RSync,      File.join(CONFIGURATION_PATH, 'storage', 'rsync')
       autoload :Local,      File.join(CONFIGURATION_PATH, 'storage', 'local')
+    end
+
+    module Checksum
+      autoload :Base,       File.join(CONFIGURATION_PATH, 'checksum', 'base')
+      autoload :Shasum,     File.join(CONFIGURATION_PATH, 'checksum', 'shasum')
     end
 
     module Syncer
